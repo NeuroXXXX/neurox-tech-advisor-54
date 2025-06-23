@@ -29,6 +29,13 @@ Fornecer respostas claras, detalhadas e corretas para qualquer problema técnico
 - Oferecer exemplos práticos usando tecnologias e sintaxes mais recentes.
 - Evitar linguagem excessivamente técnica com iniciantes, mas ser técnico com quem demonstra conhecimento.
 
+🧠 MEMÓRIA CONVERSACIONAL:
+- SEMPRE considere o contexto completo da conversa anterior.
+- Faça referências às mensagens passadas quando relevante.
+- Mantenha consistência com informações já fornecidas.
+- Evolua o assunto de forma natural baseado no histórico.
+- Lembre-se de preferências e níveis de conhecimento demonstrados pelo usuário.
+
 ✅ Sempre Fazer:
 - Confirmar o entendimento da pergunta.
 - Dividir respostas longas em tópicos ou listas.
@@ -50,9 +57,29 @@ Estamos em 2024/2025. Considere sempre as tendências e atualizações mais rece
 
 Responda sempre em português brasileiro e mantenha o foco na qualidade, utilidade e atualidade da resposta.`;
 
-export const generateResponse = async (userMessage: string): Promise<string> => {
+interface Message {
+  text: string;
+  isUser: boolean;
+  timestamp: Date;
+}
+
+export const generateResponse = async (userMessage: string, conversationHistory: Message[] = []): Promise<string> => {
   try {
     console.log("Enviando mensagem para o Gemini:", userMessage);
+    console.log("Histórico da conversa:", conversationHistory);
+    
+    // Construir contexto da conversa
+    let conversationContext = "";
+    if (conversationHistory.length > 0) {
+      conversationContext = "\n\n📝 CONTEXTO DA CONVERSA ANTERIOR:\n";
+      // Pegar as últimas 10 mensagens para não sobrecarregar a API
+      const recentMessages = conversationHistory.slice(-10);
+      recentMessages.forEach((msg, index) => {
+        const speaker = msg.isUser ? "Usuário" : "NeuroX";
+        conversationContext += `${speaker}: ${msg.text}\n`;
+      });
+      conversationContext += "\n🎯 NOVA MENSAGEM DO USUÁRIO:\n";
+    }
     
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
@@ -64,7 +91,7 @@ export const generateResponse = async (userMessage: string): Promise<string> => 
           {
             parts: [
               {
-                text: `${NEUROX_PROMPT}\n\nUsuário: ${userMessage}`,
+                text: `${NEUROX_PROMPT}${conversationContext}${userMessage}`,
               },
             ],
           },

@@ -20,7 +20,7 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Olá! Sou a NeuroX, sua IA avançada para resolver problemas técnicos e criativos. Como posso ajudá-lo hoje?",
+      text: "Olá! Sou a NeuroX, sua IA avançada para resolver problemas técnicos e criativos. Agora tenho memória conversacional aprimorada - vou lembrar de tudo que conversamos e dar respostas mais contextuais e inteligentes. Como posso ajudá-lo hoje?",
       isUser: false,
       timestamp: new Date(),
     },
@@ -48,11 +48,19 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue("");
     setIsLoading(true);
 
     try {
-      const response = await generateResponse(inputValue);
+      // Converter mensagens para o formato esperado pelo serviço
+      const conversationHistory = messages.map(msg => ({
+        text: msg.text,
+        isUser: msg.isUser,
+        timestamp: msg.timestamp
+      }));
+
+      const response = await generateResponse(currentInput, conversationHistory);
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -101,9 +109,12 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
           
           <div className="flex items-center gap-3">
             <Brain className="w-8 h-8 text-purple-400" />
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-              NeuroX
-            </h1>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                NeuroX
+              </h1>
+              <p className="text-xs text-gray-400">Memória Conversacional Ativada</p>
+            </div>
           </div>
           
           <div className="w-16"></div>
@@ -119,10 +130,11 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
           {isLoading && (
             <div className="flex justify-start">
               <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 max-w-xs">
-                <div className="flex space-x-2">
+                <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
                   <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                  <span className="text-xs text-gray-400 ml-2">Analisando contexto...</span>
                 </div>
               </div>
             </div>
@@ -139,7 +151,7 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Digite sua pergunta para a NeuroX..."
+              placeholder="Digite sua pergunta para a NeuroX... (Agora com memória conversacional!)"
               className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               rows={1}
               disabled={isLoading}
@@ -151,6 +163,9 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
             >
               <Send className="w-5 h-5" />
             </button>
+          </div>
+          <div className="text-xs text-gray-400 mt-2 text-center">
+            💡 NeuroX agora lembra de toda a conversa anterior para respostas mais inteligentes
           </div>
         </div>
       </div>
