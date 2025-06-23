@@ -1,6 +1,6 @@
 
 const GEMINI_API_KEY = "AIzaSyDV-OEBSIQvArW0-jc6-VVa5rERL9jIJvI";
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
 const NEUROX_PROMPT = `Você é NeuroX: uma Inteligência Artificial avançada, projetada para responder perguntas técnicas, resolver enigmas, auxiliar no desenvolvimento de software, dar soluções criativas e fornecer explicações lógicas passo a passo.
 
@@ -39,6 +39,8 @@ Responda sempre em português brasileiro e mantenha o foco na qualidade e utilid
 
 export const generateResponse = async (userMessage: string): Promise<string> => {
   try {
+    console.log("Enviando mensagem para o Gemini:", userMessage);
+    
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
@@ -81,19 +83,30 @@ export const generateResponse = async (userMessage: string): Promise<string> => 
       }),
     });
 
+    console.log("Resposta da API:", response.status, response.statusText);
+
     if (!response.ok) {
-      throw new Error(`Erro na API: ${response.status}`);
+      const errorData = await response.json();
+      console.error("Erro detalhado da API:", errorData);
+      throw new Error(`Erro na API: ${response.status} - ${errorData.error?.message || 'Erro desconhecido'}`);
     }
 
     const data = await response.json();
+    console.log("Dados recebidos:", data);
     
     if (data.candidates && data.candidates[0] && data.candidates[0].content) {
       return data.candidates[0].content.parts[0].text;
     } else {
+      console.error("Estrutura de resposta inválida:", data);
       throw new Error("Resposta inválida da API");
     }
   } catch (error) {
     console.error("Erro ao chamar a API do Gemini:", error);
-    throw new Error("Falha ao gerar resposta. Verifique sua conexão com a internet.");
+    
+    if (error instanceof Error) {
+      throw new Error(`Falha ao gerar resposta: ${error.message}`);
+    } else {
+      throw new Error("Falha ao gerar resposta. Verifique sua conexão com a internet.");
+    }
   }
 };
