@@ -1,12 +1,11 @@
 
-import { Brain, User, Globe, Cpu } from "lucide-react";
+import { Brain, User } from "lucide-react";
 
 interface Message {
   id: string;
   text: string;
   isUser: boolean;
   timestamp: Date;
-  source?: 'gemini' | 'perplexity';
 }
 
 interface MessageBubbleProps {
@@ -19,20 +18,6 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
-
-  const getSourceIcon = () => {
-    if (message.source === 'perplexity') {
-      return <Globe className="w-3 h-3 text-green-400" />;
-    }
-    return <Cpu className="w-3 h-3 text-blue-400" />;
-  };
-
-  const getSourceLabel = () => {
-    if (message.source === 'perplexity') {
-      return 'Internet';
-    }
-    return 'Offline';
   };
 
   if (message.isUser) {
@@ -62,12 +47,6 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 text-white">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-semibold text-purple-400">NeuroX</span>
-            {message.source && (
-              <div className="flex items-center gap-1 text-xs text-gray-400">
-                {getSourceIcon()}
-                <span>{getSourceLabel()}</span>
-              </div>
-            )}
           </div>
           <p className="whitespace-pre-wrap leading-relaxed">{message.text}</p>
           <div className="text-xs text-gray-400 mt-2">

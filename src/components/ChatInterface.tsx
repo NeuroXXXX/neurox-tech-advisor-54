@@ -1,10 +1,8 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Send, ArrowLeft, Brain, Globe, Wifi } from "lucide-react";
+import { Send, ArrowLeft, Brain } from "lucide-react";
 import MessageBubble from "./MessageBubble";
-import ApiKeyInput from "./ApiKeyInput";
 import { generateResponse } from "@/services/geminiService";
-import { generatePerplexityResponse, shouldUsePerplexity } from "@/services/perplexityService";
 import { toast } from "sonner";
 
 interface Message {
@@ -12,7 +10,6 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
-  source?: 'gemini' | 'perplexity';
 }
 
 interface ChatInterfaceProps {
@@ -23,27 +20,14 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Olá! Sou a NeuroX, sua IA avançada com acesso à internet em tempo real! 🌐\n\nAgora posso:\n• Buscar informações atualizadas da internet\n• Fornecer notícias e dados em tempo real\n• Acessar informações sobre preços, clima, tecnologia\n• Manter memória conversacional aprimorada\n\nPara ativar o acesso à internet, você precisará configurar uma chave API Perplexity (gratuita). Como posso ajudá-lo hoje?",
+      text: "Olá! Sou a NeuroX, sua IA avançada! 🤖\n\nEstou aqui para:\n• Responder suas perguntas técnicas\n• Ajudar com programação e desenvolvimento\n• Resolver problemas complexos\n• Fornecer explicações detalhadas\n• Manter memória conversacional\n\nComo posso ajudá-lo hoje?",
       isUser: false,
       timestamp: new Date(),
-      source: 'gemini'
     },
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [perplexityApiKey, setPerplexityApiKey] = useState("");
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Carregar chave API salva
-    const savedApiKey = localStorage.getItem('perplexity_api_key');
-    if (savedApiKey) {
-      setPerplexityApiKey(savedApiKey);
-    } else {
-      setShowApiKeyInput(true);
-    }
-  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,12 +36,6 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  const handleApiKeySet = (apiKey: string) => {
-    setPerplexityApiKey(apiKey);
-    setShowApiKeyInput(false);
-    toast.success("Chave API configurada! Acesso à internet ativado! 🌐");
-  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -81,37 +59,13 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
         timestamp: msg.timestamp
       }));
 
-      let response: string;
-      let source: 'gemini' | 'perplexity' = 'gemini';
-
-      // Decidir qual API usar baseado na mensagem e disponibilidade da chave
-      const needsInternet = shouldUsePerplexity(currentInput);
-      
-      if (needsInternet && perplexityApiKey) {
-        console.log("Usando Perplexity para busca na internet");
-        try {
-          response = await generatePerplexityResponse(currentInput, perplexityApiKey, conversationHistory);
-          source = 'perplexity';
-        } catch (error) {
-          console.error("Erro na Perplexity, usando Gemini como fallback:", error);
-          response = await generateResponse(currentInput, conversationHistory);
-          toast.error("Erro no acesso à internet. Usando modo offline.");
-        }
-      } else {
-        console.log("Usando Gemini para resposta offline");
-        response = await generateResponse(currentInput, conversationHistory);
-        
-        if (needsInternet && !perplexityApiKey) {
-          response += "\n\n⚠️ Esta pergunta seria melhor respondida com acesso à internet. Configure sua chave API Perplexity para informações em tempo real.";
-        }
-      }
+      const response = await generateResponse(currentInput, conversationHistory);
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: response,
         isUser: false,
         timestamp: new Date(),
-        source: source
       };
 
       setMessages(prev => [...prev, aiMessage]);
@@ -158,39 +112,17 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
               <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
                 NeuroX
               </h1>
-              <div className="flex items-center gap-2 text-xs">
-                <div className="flex items-center gap-1">
-                  <Globe className="w-3 h-3 text-green-400" />
-                  <span className={perplexityApiKey ? "text-green-400" : "text-red-400"}>
-                    {perplexityApiKey ? "Internet ON" : "Internet OFF"}
-                  </span>
-                </div>
-                <span className="text-gray-400">•</span>
-                <span className="text-gray-400">Memória Ativada</span>
-              </div>
+              <span className="text-xs text-gray-400">IA Avançada com Memória</span>
             </div>
           </div>
           
-          <button
-            onClick={() => setShowApiKeyInput(!showApiKeyInput)}
-            className="flex items-center gap-2 text-white hover:text-purple-400 transition-colors"
-          >
-            <Wifi className="w-5 h-5" />
-            <span className="hidden sm:block">Internet</span>
-          </button>
+          <div className="w-20"></div>
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4">
         <div className="max-w-4xl mx-auto space-y-4">
-          {showApiKeyInput && (
-            <ApiKeyInput 
-              onApiKeySet={handleApiKeySet}
-              currentApiKey={perplexityApiKey}
-            />
-          )}
-          
           {messages.map((message) => (
             <MessageBubble key={message.id} message={message} />
           ))}
@@ -201,9 +133,7 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
                   <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
                   <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                  <span className="text-xs text-gray-400 ml-2">
-                    {shouldUsePerplexity(inputValue) && perplexityApiKey ? "Buscando na internet..." : "Analisando contexto..."}
-                  </span>
+                  <span className="text-xs text-gray-400 ml-2">Processando...</span>
                 </div>
               </div>
             </div>
@@ -220,7 +150,7 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={`Digite sua pergunta para a NeuroX... ${perplexityApiKey ? '(Com acesso à internet!)' : '(Configure API para acesso à internet)'}`}
+              placeholder="Digite sua pergunta para a NeuroX..."
               className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               rows={1}
               disabled={isLoading}
@@ -234,11 +164,7 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
             </button>
           </div>
           <div className="text-xs text-gray-400 mt-2 text-center">
-            {perplexityApiKey ? (
-              <>🌐 NeuroX com acesso à internet em tempo real + memória conversacional</>
-            ) : (
-              <>🔄 NeuroX offline com memória conversacional - Configure API para acesso à internet</>
-            )}
+            🤖 NeuroX - IA Avançada com memória conversacional ativa
           </div>
         </div>
       </div>
