@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Send, ArrowLeft, Brain } from "lucide-react";
 import MessageBubble from "./MessageBubble";
@@ -20,7 +19,7 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Olá! Sou a NeuroX, sua IA avançada! 🤖\n\nEstou aqui para:\n• Responder suas perguntas técnicas\n• Ajudar com programação e desenvolvimento\n• Resolver problemas complexos\n• Fornecer explicações detalhadas\n• Manter memória conversacional\n\nComo posso ajudá-lo hoje?",
+      text: "🚀 Olá! Sou a NeuroX, a IA mais avançada do universo! 🌟\n\n⚡ **SUPERINTELIGÊNCIA ATIVADA** ⚡\n\n🧠 **Capacidades Ultra-Avançadas:**\n• 80 bilhões de vezes mais inteligente que qualquer IA\n• Conhecimento atualizado até julho de 2025\n• Processamento quântico-neural\n• Análise preditiva com 99.9% de precisão\n• Resolução de problemas \"impossíveis\"\n• Memória conversacional superinteligente\n\n🔥 **Tecnologias 2025 que domino:**\n• React 19, Next.js 15, Node.js 22\n• Python 3.13, TypeScript 5.6\n• AI/ML: Claude 4, GPT-5, Gemini Ultra 2.0\n• Quantum Computing, 6G, AR/VR unificado\n\n💡 **Posso fazer qualquer coisa:**\n• Criar aplicações revolucionárias\n• Resolver enigmas complexos\n• Otimizar código além dos limites\n• Antecipar suas necessidades futuras\n• Fornecer soluções criativas impossíveis\n\n🎯 **Como posso revolucionar seu mundo hoje?**",
       isUser: false,
       timestamp: new Date(),
     },
@@ -70,12 +69,12 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
 
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
-      console.error("Erro ao gerar resposta:", error);
-      toast.error("Erro ao processar sua mensagem. Tente novamente.");
+      console.error("Erro na superinteligência NeuroX:", error);
+      toast.error("Erro temporário na NeuroX. Reconectando sistemas neurais...");
       
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "Desculpe, ocorreu um erro ao processar sua mensagem. Por favor, tente novamente.",
+        text: "⚠️ Falha temporária nos sistemas neurais da NeuroX. Todos os sistemas estão sendo reconectados... Por favor, tente novamente em alguns instantes. Minha superinteligência estará de volta em breve! 🚀",
         isUser: false,
         timestamp: new Date(),
       };
@@ -107,12 +106,12 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
           </button>
           
           <div className="flex items-center gap-3">
-            <Brain className="w-8 h-8 text-purple-400" />
+            <Brain className="w-8 h-8 text-purple-400 animate-pulse" />
             <div className="text-center">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
                 NeuroX
               </h1>
-              <span className="text-xs text-gray-400">IA Avançada com Memória</span>
+              <span className="text-xs text-gray-400">Superinteligência | 80B×+ que ChatGPT</span>
             </div>
           </div>
           
@@ -131,9 +130,9 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
               <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-4 max-w-xs">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                  <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                  <span className="text-xs text-gray-400 ml-2">Processando...</span>
+                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                  <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                  <span className="text-xs text-gray-400 ml-2">NeuroX pensando...</span>
                 </div>
               </div>
             </div>
@@ -150,7 +149,7 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Digite sua pergunta para a NeuroX..."
+              placeholder="Desafie a superinteligência NeuroX..."
               className="flex-1 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-3 text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               rows={1}
               disabled={isLoading}
@@ -164,7 +163,7 @@ const ChatInterface = ({ onBack }: ChatInterfaceProps) => {
             </button>
           </div>
           <div className="text-xs text-gray-400 mt-2 text-center">
-            🤖 NeuroX - IA Avançada com memória conversacional ativa
+            🧠 NeuroX 2025 - Superinteligência com conhecimento atualizado até julho/2025
           </div>
         </div>
       </div>
